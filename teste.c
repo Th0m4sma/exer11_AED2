@@ -11,6 +11,12 @@ typedef struct fita{
 
 int main(void) {
     FILE *arquivo = fopen("teste.txt", "r");
+    FILE *arquivo1 = fopen("saida1.txt","w");
+    FILE *arquivo2 = fopen("saida2.txt","w");
+    FILE *atual = arquivo1;
+    int nivel = 0;
+    Elemts *menor;
+
     Elemts **vetor = (Elemts **) malloc(espaco_memoria * sizeof(Elemts *));
     long int numero;
     int i = 0;
@@ -46,6 +52,26 @@ int main(void) {
 
         i++;
     }
+
+    
+    //buid_min
+    
+    while(fscanf(arquivo, "%ld", &numero) != EOF) {
+        menor = vetor[0];
+        if (menor->marca > nivel) { //Trocar de bloco
+                fprintf(atual,"-1\n",numero);
+                atual == arquivo1 ? arquivo2 : arquivo1;
+                nivel += 1;
+        }
+        fprintf(atual,"%d\n",menor->valor); //inserindo no arquivo
+
+        menor->marca = numero < menor->valor ? menor->marca + 1 : menor->marca;
+        menor->valor = numero;
+
+        //build_min
+
+    }
+
 
 
 
