@@ -9,6 +9,7 @@ typedef struct fita{
 }Fita;
 
 
+
 int main(void) {
     FILE *arquivo = fopen("teste.txt", "r");
     FILE *arquivo1 = fopen("saida1.txt","w");
@@ -54,23 +55,24 @@ int main(void) {
     }
 
     
-    //buid_min
+    buildHeap(vetor,espaco_memoria);
     
     while(fscanf(arquivo, "%ld", &numero) != EOF) {
         menor = vetor[0];
         if (menor->marca > nivel) { //Trocar de bloco
-                fprintf(atual,"-1\n",numero);
-                atual == arquivo1 ? arquivo2 : arquivo1;
+                fprintf(atual,"-1\n");
+                atual = (atual == arquivo1) ? arquivo2 : arquivo1;
                 nivel += 1;
         }
-        fprintf(atual,"%d\n",menor->valor); //inserindo no arquivo
+        fprintf(atual,"%ld\n",menor->valor); //inserindo no arquivo
 
         menor->marca = numero < menor->valor ? menor->marca + 1 : menor->marca;
         menor->valor = numero;
 
-        //build_min
+        buildHeap(vetor,espaco_memoria);
 
     }
+
 
 
 

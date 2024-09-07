@@ -48,8 +48,9 @@ void buildHeap(Elemts **vetor, int quant) {
 }
 
 
-long int heap_Extract(Elemts **vetor,int quant) {
+long int heap_Extract(Elemts **vetor,int *quant) {
     long int menor = vetor[0];
-    vetor[0] = vetor[quant];
+    vetor[0] = vetor[*quant];
+    *quant--;
     return menor;
 }
