@@ -307,7 +307,7 @@ int main(void) {
     arquivo1 = fopen("saida1.txt", "r");
     arquivo2 = fopen("saida2.txt", "r");
 
-    mescla_fitas(arquivo1,arquivo2,nivel,1);
+    intercalacao(arquivo1,arquivo2,nivel); 
 
 
 
