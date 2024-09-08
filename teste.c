@@ -1,12 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct fita {
-    FILE *arquivo;
-    int *vetor_quant;
-    int quant_blocos;
-} Fita;
-
 typedef struct elementos {
     int marca;
     long int valor;
@@ -113,6 +107,73 @@ void processaRestantes(Elemts **vetor, FILE *arquivo1, FILE *arquivo2, int nivel
 }
 
 
+void mescla_blocos(FILE *arquivo_principal,FILE *arquivo_saida1,FILE *arquivo_saida2) {
+    long int numero1,numero2;
+
+    fscanf(arquivo_saida1, "%ld", &numero1);
+    fscanf(arquivo_saida2, "%ld", &numero2);
+
+    while(numero1 != -1 && numero2 != -1) {
+        if(numero1 < numero2) {
+            fprintf(arquivo_principal, "%ld\n", numero1);
+            fscanf(arquivo_saida1, "%ld", &numero1);
+        }else if(numero1 > numero2){
+            fprintf(arquivo_principal, "%ld\n", numero2);
+            fscanf(arquivo_saida2, "%ld", &numero2);
+        }else{
+            fprintf(arquivo_principal, "%ld\n", numero1);
+            fprintf(arquivo_principal, "%ld\n", numero2);
+            fscanf(arquivo_saida1, "%ld", &numero1);
+            fscanf(arquivo_saida2, "%ld", &numero2);
+        }
+    }
+
+    if(numero1 == -1) {
+        while(fscanf(arquivo_saida2, "%ld", &numero2)) {
+            fprintf(arquivo_principal, "%ld\n", numero2);
+        }
+    }else{
+        while(fscanf(arquivo_saida1, "%ld", &numero1)) {
+            fprintf(arquivo_principal, "%ld\n", numero1);
+        }
+    }
+
+    fprintf(arquivo_principal, "-1\n");
+}
+
+
+
+void mescla_fitas(FILE * arq1, FILE *arq2,int quant_blocos) {
+    FILE *atual;
+    FILE *arq_novo1 = fopen("teste1.txt","w");
+    FILE *arq_novo2 = fopen("teste2.txt","w");
+    atual = arq_novo1;
+    int numero;
+
+    for(int i=0;i<quant_blocos-1;i++) {
+        mescla_blocos(atual,arq1,arq2);
+
+        if(atual == arq_novo1) {
+            atual = arq_novo2;
+        }else {
+            atual = arq_novo1;
+        }
+    }
+
+    if(fscanf(arq1, "%ld", &numero) != EOF) {
+        while(fscanf(arq2, "%ld", &numero)) {
+            fprintf(atual, "%ld\n", numero);
+        }  
+        fprintf(arq2, "-1\n");
+    }else{
+        while(fscanf(arq1, "%ld", &numero)) {
+            fprintf(atual, "%ld\n", numero);
+        }
+        fprintf(arq1, "-1\n");
+    }
+}
+
+
 int main(void) {
     FILE *arquivo = fopen("arquivo.txt", "r");
     FILE *arquivo1 = fopen("saida1.txt", "w");
@@ -195,6 +256,25 @@ int main(void) {
 
     processaRestantes(vetor, arquivo1, arquivo2, nivel, atual);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // Libera a memória alocada para cada elemento
     for (int j = 0; j < i; j++) {
         free(vetor[j]);
@@ -210,3 +290,5 @@ int main(void) {
 
     return 0;
 }
+
+
