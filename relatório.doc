@@ -1,7 +1,7 @@
 NOME DOS ALUNOS (grupo de 3 pessoas):
-Thomas Pires Correia    169243
-Lucas Mollinari     
-Miguel Gustavo
+Thomas Pires Correia         169243
+Lucas Mollinari              168885
+Miguel Gustavo Santos Rangel 169020
 
 1) O método utilizado para ordenar foi uma espécie de merge para arquivo. Descidimos montar as nossas "fitas" (arquivos), através de um heap minimo 
 e ao final de cada bloco temos um "-1", indicando que ali se termina um bloco e inicia-se um novo. Em seguida percorremos os dois arquivos principais 
