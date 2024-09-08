@@ -64,7 +64,10 @@ int todosMarcados(Elemts **vetor, int quant) {
 void processaRestantes(Elemts **vetor, FILE *arquivo1, FILE *arquivo2, int nivel, FILE *atual) {
     int sair = 1;
     long int ultimo = vetor[0]->valor;
-    
+
+    vetor[0]->valor = 100000;
+    buildHeap(vetor, espaco_memoria);
+
     while (sair) {
         Elemts *menor = vetor[0]; // Pega o menor elemento do heap
 
@@ -107,70 +110,124 @@ void processaRestantes(Elemts **vetor, FILE *arquivo1, FILE *arquivo2, int nivel
 }
 
 
-void mescla_blocos(FILE *arquivo_principal,FILE *arquivo_saida1,FILE *arquivo_saida2) {
-    long int numero1,numero2;
+void mescla_blocos(FILE *arquivo_principal, FILE *arquivo_saida1, FILE *arquivo_saida2) {
+    long int numero1, numero2;
+    int res1, res2;
 
-    fscanf(arquivo_saida1, "%ld", &numero1);
-    fscanf(arquivo_saida2, "%ld", &numero2);
+    // Inicializa a leitura de ambos os arquivos
+    res1 = fscanf(arquivo_saida1, "%ld", &numero1);
+    res2 = fscanf(arquivo_saida2, "%ld", &numero2);
 
-    while(numero1 != -1 && numero2 != -1) {
-        if(numero1 < numero2) {
+    // Mescla enquanto ambos os números forem válidos (nenhum deles atingiu o delimitador ou o fim)
+    while (res1 == 1 && res2 == 1 && numero1 != -1 && numero2 != -1) {
+        if (numero1 < numero2) {
             fprintf(arquivo_principal, "%ld\n", numero1);
-            fscanf(arquivo_saida1, "%ld", &numero1);
-        }else if(numero1 > numero2){
+            res1 = fscanf(arquivo_saida1, "%ld", &numero1);  // Lê o próximo número de arq1
+        } else {
             fprintf(arquivo_principal, "%ld\n", numero2);
-            fscanf(arquivo_saida2, "%ld", &numero2);
-        }else{
-            fprintf(arquivo_principal, "%ld\n", numero1);
-            fprintf(arquivo_principal, "%ld\n", numero2);
-            fscanf(arquivo_saida1, "%ld", &numero1);
-            fscanf(arquivo_saida2, "%ld", &numero2);
+            res2 = fscanf(arquivo_saida2, "%ld", &numero2);  // Lê o próximo número de arq2
         }
     }
 
-    if(numero1 == -1) {
-        while(fscanf(arquivo_saida2, "%ld", &numero2)) {
-            fprintf(arquivo_principal, "%ld\n", numero2);
-        }
-    }else{
-        while(fscanf(arquivo_saida1, "%ld", &numero1)) {
-            fprintf(arquivo_principal, "%ld\n", numero1);
-        }
+    // Processa os números restantes de arquivo_saida1 se arquivo_saida2 terminou
+    while (res1 == 1 && numero1 != -1) {
+        fprintf(arquivo_principal, "%ld\n", numero1);
+        res1 = fscanf(arquivo_saida1, "%ld", &numero1);  // Continua lendo o restante
     }
 
+    // Processa os números restantes de arquivo_saida2 se arquivo_saida1 terminou
+    while (res2 == 1 && numero2 != -1) {
+        fprintf(arquivo_principal, "%ld\n", numero2);
+        res2 = fscanf(arquivo_saida2, "%ld", &numero2);  // Continua lendo o restante
+    }
+
+    // Escreve o delimitador de bloco no final
     fprintf(arquivo_principal, "-1\n");
+
+    printf("Mesclagem de blocos concluída.\n");
 }
 
-
-
-void mescla_fitas(FILE * arq1, FILE *arq2,int quant_blocos) {
+void mescla_fitas(FILE *arq1, FILE *arq2, int quant_blocos) {
     FILE *atual;
-    FILE *arq_novo1 = fopen("teste1.txt","w");
-    FILE *arq_novo2 = fopen("teste2.txt","w");
+    FILE *arq_novo1 = fopen("teste1.txt", "w");
+    FILE *arq_novo2 = fopen("teste2.txt", "w");
     atual = arq_novo1;
-    int numero;
+    int numero1, numero2;
+    int res1, res2;
 
-    for(int i=0;i<quant_blocos-1;i++) {
-        mescla_blocos(atual,arq1,arq2);
+    for (int i = 0; i < quant_blocos; i++) {
+        mescla_blocos(atual, arq1, arq2);
 
-        if(atual == arq_novo1) {
+        // Alterna os arquivos de saída
+        if (atual == arq_novo1) {
             atual = arq_novo2;
-        }else {
+        } else {
             atual = arq_novo1;
         }
     }
 
-    if(fscanf(arq1, "%ld", &numero) != EOF) {
-        while(fscanf(arq2, "%ld", &numero)) {
-            fprintf(atual, "%ld\n", numero);
-        }  
-        fprintf(arq2, "-1\n");
-    }else{
-        while(fscanf(arq1, "%ld", &numero)) {
-            fprintf(atual, "%ld\n", numero);
-        }
-        fprintf(arq1, "-1\n");
+    // Lendo os números restantes de arq1 e arq2
+    res1 = fscanf(arq1, "%d", &numero1);
+    res2 = fscanf(arq2, "%d", &numero2);
+
+    // Escreve o restante de arq1 se arq2 estiver vazio, ignorando o -1
+    while (res1 == 1 && numero1 != -1) {
+        fprintf(atual, "%d\n", numero1);
+        res1 = fscanf(arq1, "%d", &numero1);
     }
+
+    // Escreve o restante de arq2 se arq1 estiver vazio, ignorando o -1
+    while (res2 == 1 && numero2 != -1) {
+        fprintf(atual, "%d\n", numero2);
+        res2 = fscanf(arq2, "%d", &numero2);
+    }
+
+    // Escreve o delimitador de fim de bloco
+    fprintf(atual, "-1\n");
+
+    // Fechando os arquivos de saída
+    fclose(arq_novo1);
+    fclose(arq_novo2);
+}
+
+
+void intercalacao(FILE *arq1, FILE *arq2, int quantidade_blocos) {
+    FILE *arq_temp1, *arq_temp2;
+    FILE *temp1, *temp2;
+    
+    // Enquanto houver mais de um bloco, continue a intercalação
+    while (quantidade_blocos > 1) {
+        // Cria arquivos temporários para armazenar os resultados da intercalação
+        temp1 = fopen("temp1.txt", "w");
+        temp2 = fopen("temp2.txt", "w");
+
+        if (temp1 == NULL || temp2 == NULL) {
+            printf("Erro ao abrir arquivos temporários.\n");
+            exit(1);
+        }
+
+        // Mescla blocos nos arquivos temporários
+        mescla_fitas(arq1, arq2, quantidade_blocos);
+
+        fclose(temp1);
+        fclose(temp2);
+
+        // Reabre os arquivos temporários para a próxima etapa de intercalação
+        arq1 = fopen("temp1.txt", "r");
+        arq2 = fopen("temp2.txt", "r");
+
+        if (arq1 == NULL || arq2 == NULL) {
+            printf("Erro ao reabrir arquivos temporários.\n");
+            exit(1);
+        }
+
+        // Atualiza a quantidade de blocos para a próxima iteração
+        quantidade_blocos = (quantidade_blocos + 1) / 2;  // Divide o número de blocos por 2, arredondando para cima
+    }
+
+    // Fecha os arquivos finais
+    fclose(arq1);
+    fclose(arq2);
 }
 
 
@@ -219,7 +276,6 @@ int main(void) {
         i++;
     }
 
-    
     printf("Passou\n");
     buildHeap(vetor, espaco_memoria);
     menor = vetor[0];
@@ -241,7 +297,7 @@ int main(void) {
 
         if (todosMarcados(vetor, espaco_memoria) == 1) {  // Troca de arquivo se todos estiverem marcados
             printf("Todos os elementos foram marcados, trocando de arquivo.\n");
-            fprintf(atual, "-1\n");
+            fprintf(atual, "-1\n");  // Escreve delimitador de bloco no arquivo
             atual = (atual == arquivo1) ? arquivo2 : arquivo1;  // Alterna entre os arquivos
             nivel += 1;
             // Reinicializa as marcas
@@ -254,9 +310,17 @@ int main(void) {
         ultimo = menor->valor;  // Atualiza 'ultimo' com o valor que acabou de ser inserido
     }
 
-    processaRestantes(vetor, arquivo1, arquivo2, nivel, atual);
+    
+    processaRestantes(vetor, arquivo1, arquivo2, nivel, atual); //Processa os ultimos elementos do vetor 
 
+    printf("FINAL\n");
 
+    fclose(arquivo1);
+    fclose(arquivo2);
+    arquivo1 = fopen("saida1.txt", "r");
+    arquivo2 = fopen("saida2.txt", "r");
+
+    intercalacao(arquivo1,arquivo2,nivel);
 
 
 
@@ -290,5 +354,3 @@ int main(void) {
 
     return 0;
 }
-
-
