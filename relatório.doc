@@ -4,7 +4,8 @@ Lucas Mollinari
 Miguel Gustavo
 
 1) O método utilizado para ordenar foi uma espécie de merge para arquivo. Descidimos montar as nossas "fitas" (arquivos), através de um heap minimo 
-e ao final de cada bloco temos um "-1", indicando o final. Em seguida percorremos os dois arquivos principais percorrendo e mesclando cada bloco.
+e ao final de cada bloco temos um "-1", indicando que ali se termina um bloco e inicia-se um novo. Em seguida percorremos os dois arquivos principais 
+percorrendo e mesclando cada bloco.
 
 2)
 
