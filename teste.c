@@ -147,13 +147,21 @@ void mescla_blocos(FILE *arquivo_principal, FILE *arquivo_saida1, FILE *arquivo_
     printf("Mesclagem de blocos concluída.\n");
 }
 
-void mescla_fitas(FILE *arq1, FILE *arq2, int quant_blocos) {
+void mescla_fitas(FILE *arq1, FILE *arq2, int quant_blocos,int tipo) {
     FILE *atual;
-    FILE *arq_novo1 = fopen("teste1.txt", "w");
-    FILE *arq_novo2 = fopen("teste2.txt", "w");
+    FILE *arq_novo1;
+    FILE *arq_novo2;
     atual = arq_novo1;
     int numero1, numero2;
     int res1, res2;
+
+    if(tipo == 0) {
+        arq_novo1 = fopen("teste1.txt", "w");
+        arq_novo2 = fopen("teste2.txt", "w");
+    }else{
+        arq_novo1 = fopen("teste3.txt", "w");
+        arq_novo2 = fopen("teste4.txt", "w");
+    }
 
     for (int i = 0; i < quant_blocos; i++) {
         mescla_blocos(atual, arq1, arq2);
@@ -192,37 +200,16 @@ void mescla_fitas(FILE *arq1, FILE *arq2, int quant_blocos) {
 
 
 void intercalacao(FILE *arq1, FILE *arq2, int quantidade_blocos) {
-    FILE *arq_temp1, *arq_temp2;
-    FILE *temp1, *temp2;
-    
+    int tipo=0;
+
     // Enquanto houver mais de um bloco, continue a intercalação
     while (quantidade_blocos > 1) {
-        // Cria arquivos temporários para armazenar os resultados da intercalação
-        temp1 = fopen("temp1.txt", "w");
-        temp2 = fopen("temp2.txt", "w");
-
-        if (temp1 == NULL || temp2 == NULL) {
-            printf("Erro ao abrir arquivos temporários.\n");
-            exit(1);
-        }
-
+        if(tipo == 0) tipo =1;
+        else tipo = 1;
         // Mescla blocos nos arquivos temporários
-        mescla_fitas(arq1, arq2, quantidade_blocos);
+        mescla_fitas(arq1, arq2, quantidade_blocos,tipo);
 
-        fclose(temp1);
-        fclose(temp2);
-
-        // Reabre os arquivos temporários para a próxima etapa de intercalação
-        arq1 = fopen("temp1.txt", "r");
-        arq2 = fopen("temp2.txt", "r");
-
-        if (arq1 == NULL || arq2 == NULL) {
-            printf("Erro ao reabrir arquivos temporários.\n");
-            exit(1);
-        }
-
-        // Atualiza a quantidade de blocos para a próxima iteração
-        quantidade_blocos = (quantidade_blocos + 1) / 2;  // Divide o número de blocos por 2, arredondando para cima
+        quantidade_blocos = quantidade_blocos-1;  
     }
 
     // Fecha os arquivos finais
@@ -320,7 +307,7 @@ int main(void) {
     arquivo1 = fopen("saida1.txt", "r");
     arquivo2 = fopen("saida2.txt", "r");
 
-    intercalacao(arquivo1,arquivo2,nivel);
+    mescla_fitas(arquivo1,arquivo2,nivel,1);
 
 
 
